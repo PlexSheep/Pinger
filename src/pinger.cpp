@@ -8,6 +8,7 @@ const int TARGET_ARR_SIZE = 16;
 int timeMultiplier = DEFAULT_TIME;
 int targetsSet = 0;
 bool usedArg;
+bool verbose = false;
 string target[TARGET_ARR_SIZE];
 
 bool ping(string target) {
@@ -22,6 +23,11 @@ bool ping(string target) {
 void help() {
   cout << "Usage: pinger TARGET1 TARGET2...\n"
        << "Keep the user informed, if a target is connected.\n\n"
+
+       << "Targeting:\n\n"
+
+       << "Target can be FQDN or IP adress (IPv4 or IPv6)\n"
+       << "Examples: sub.example.com 1.1.1.1 ::1\n\n"
 
        << "Options:\n\n"
 
@@ -47,10 +53,10 @@ int main(int argc, char *argv[]) {
 
   for (int i = 1; i < argc; i++) {
 
-	  if(usedArg) {
-		  usedArg = false;
-		  continue;
-	  }
+    if (usedArg) {
+      usedArg = false;
+      continue;
+    }
 
     if (string(argv[i]) == "-h") {
       help();
@@ -65,24 +71,38 @@ int main(int argc, char *argv[]) {
     else if (string(argv[i]) == "-d" || string(argv[i]) == "--delay") {
       if (i + 1 < argc) { // check if a following arg exists
         timeMultiplier = stoi(string(argv[i + 1]));
-		usedArg = true;
-		continue;
+        usedArg = true;
+        continue;
+      } else {
+        cerr << "no argument for option delay (-d or --delay) provided.\n";
+        return 1;
       }
+    }
+
+    else if (string(argv[i]) == "-v" || string(argv[i]) == "--verbose") {
+      verbose = true;
+      continue;
     }
 
     else {
       if (targetsSet < 14)
         target[targetsSet++] = string(argv[i]);
       else {
-      cerr << "too many target! Max is 16.\n";
-	  return 1;
-	  }
-	  continue;
+        cerr << "Too many targets! Max is 16.\n";
+        return 1;
+      }
+      continue;
     }
   }
 
   for (int i = 0;; i++) {
-    cout << "rep " << i << endl;
+    if (verbose) {
+      cout << "rep " << i << " @ " << 60000 / timeMultiplier << " reps/min\n"
+           << 60000 / timeMultiplier * targetsSet << " pings/min\n";
+    }
+    else {
+       cout << "rep " << i << endl;
+    }
     for (int j = 0; j < targetsSet; j++) {
       cout << "| " << ping(target[j]) << "	[" << target[j] << "]" << endl;
     }
