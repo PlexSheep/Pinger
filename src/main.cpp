@@ -99,9 +99,8 @@ int main(int argc, char *argv[]) {
     if (verbose) {
       cout << "rep " << i << " @ " << 60000 / timeMultiplier << " reps/min\n"
            << 60000 / timeMultiplier * targetsSet << " pings/min\n";
-    }
-    else {
-       cout << "rep " << i << endl;
+    } else {
+      cout << "rep " << i << endl;
     }
     for (int j = 0; j < targetsSet; j++) {
       cout << "| " << ping(target[j]) << "	[" << target[j] << "]" << endl;
